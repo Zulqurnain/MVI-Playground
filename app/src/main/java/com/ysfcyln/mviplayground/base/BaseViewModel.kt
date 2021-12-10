@@ -6,35 +6,35 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect> : ViewModel() {
+abstract class BaseViewModel<Intent : MviIntent, State : MviState, Result : MviResult> : ViewModel() {
 
     private val initialState : State by lazy { createInitialState() }
     abstract fun createInitialState() : State
 
     val currentState: State
-        get() = uiState.value
+        get() = states.value
 
-    private val _uiState : MutableStateFlow<State> = MutableStateFlow(initialState)
-    val uiState = _uiState.asStateFlow()
+    private val _states : MutableStateFlow<State> = MutableStateFlow(initialState)
+    val states = _states.asStateFlow()
 
-    private val _event : MutableSharedFlow<Event> = MutableSharedFlow()
-    val event = _event.asSharedFlow()
+    private val _intent : MutableSharedFlow<Intent> = MutableSharedFlow()
+    val intent = _intent.asSharedFlow()
 
-    private val _effect : Channel<Effect> = Channel()
-    val effect = _effect.receiveAsFlow()
+    private val _result : Channel<Result> = Channel()
+    val result = _result.receiveAsFlow()
 
 
     init {
-        subscribeEvents()
+        subscribeIntents()
     }
 
     /**
-     * Start listening to Event
+     * Start listening to Intent
      */
-    private fun subscribeEvents() {
+    private fun subscribeIntents() {
         viewModelScope.launch {
-            event.collect {
-                handleEvent(it)
+            intent.collect {
+                processIntents(it)
             }
         }
     }
@@ -42,15 +42,15 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
     /**
      * Handle each event
      */
-    abstract fun handleEvent(event : Event)
+    abstract fun processIntents(intent : Intent)
 
 
     /**
-     * Set new Event
+     * Set new Intent
      */
-    fun setEvent(event : Event) {
-        val newEvent = event
-        viewModelScope.launch { _event.emit(newEvent) }
+    fun setIntent(intent : Intent) {
+        val newIntent = intent
+        viewModelScope.launch { _intent.emit(newIntent) }
     }
 
 
@@ -59,14 +59,14 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
      */
     protected fun setState(reduce: State.() -> State) {
         val newState = currentState.reduce()
-        _uiState.value = newState
+        _states.value = newState
     }
 
     /**
-     * Set new Effect
+     * Set new Result
      */
-    protected fun setEffect(builder: () -> Effect) {
+    protected fun setResult(builder: () -> Result) {
         val effectValue = builder()
-        viewModelScope.launch { _effect.send(effectValue) }
+        viewModelScope.launch { _result.send(effectValue) }
     }
 }

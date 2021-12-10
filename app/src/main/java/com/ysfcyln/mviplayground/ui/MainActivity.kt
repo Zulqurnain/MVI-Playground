@@ -25,10 +25,10 @@ class MainActivity : AppCompatActivity() {
 
         initObservers()
         binding.generateNumber.setOnClickListener {
-            viewModel.setEvent(MainContract.Event.OnRandomNumberClicked)
+            viewModel.setIntent(MainContract.MyIntent.OnRandomNumberClicked)
         }
         binding.showToast.setOnClickListener {
-            viewModel.setEvent(MainContract.Event.OnShowToastClicked)
+            viewModel.setIntent(MainContract.MyIntent.OnShowToastClicked)
         }
         binding.secondActivity.setOnClickListener {
             startActivity(Intent(this, SecondActivity::class.java))
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun initObservers() {
         lifecycleScope.launchWhenStarted {
-            viewModel.uiState.collect {
+            viewModel.states.collect {
                 when (it.randomNumberState) {
                     is MainContract.RandomNumberState.Idle -> { binding.progressBar.isVisible = false }
                     is MainContract.RandomNumberState.Loading -> { binding.progressBar.isVisible = true }
@@ -53,9 +53,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launchWhenStarted {
-            viewModel.effect.collect {
+            viewModel.result.collect {
                 when (it) {
-                    is MainContract.Effect.ShowToast -> {
+                    is MainContract.Effect.Result.ShowToast -> {
                         binding.progressBar.isVisible = false
                         showToast("Error, number is even")
                     }

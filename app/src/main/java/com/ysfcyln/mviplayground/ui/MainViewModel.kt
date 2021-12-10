@@ -5,7 +5,7 @@ import com.ysfcyln.mviplayground.base.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainViewModel : BaseViewModel<MainContract.Event, MainContract.State, MainContract.Effect>() {
+class MainViewModel : BaseViewModel<MainContract.MyIntent, MainContract.State, MainContract.Result>() {
 
 
     /**
@@ -20,11 +20,11 @@ class MainViewModel : BaseViewModel<MainContract.Event, MainContract.State, Main
     /**
      * Handle each event
      */
-    override fun handleEvent(event: MainContract.Event) {
-        when (event) {
-            is MainContract.Event.OnRandomNumberClicked -> { generateRandomNumber() }
-            is MainContract.Event.OnShowToastClicked -> {
-                setEffect { MainContract.Effect.ShowToast }
+    override fun processIntents(intent: MainContract.MyIntent) {
+        when (intent) {
+            is MainContract.MyIntent.OnRandomNumberClicked -> { generateRandomNumber() }
+            is MainContract.MyIntent.OnShowToastClicked -> {
+                setResult { MainContract.Result.ShowToast }
             }
         }
     }
@@ -46,7 +46,7 @@ class MainViewModel : BaseViewModel<MainContract.Event, MainContract.State, Main
                 }
                 setState { copy(randomNumberState = MainContract.RandomNumberState.Success(number = random)) }
             } catch (exception : Exception) {
-                setEffect { MainContract.Effect.ShowToast }
+                setResult { MainContract.Result.ShowToast }
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.ysfcyln.mviplayground.ui
 
-import com.ysfcyln.mviplayground.base.UiEffect
-import com.ysfcyln.mviplayground.base.UiEvent
-import com.ysfcyln.mviplayground.base.UiState
+import com.ysfcyln.mviplayground.base.MviResult
+import com.ysfcyln.mviplayground.base.MviIntent
+import com.ysfcyln.mviplayground.base.MviState
 
 /**
  * Contract of [MainActivity]
@@ -14,14 +14,14 @@ import com.ysfcyln.mviplayground.base.UiState
  */
 class MainContract {
 
-    sealed class Event : UiEvent {
-        object OnRandomNumberClicked : Event()
-        object OnShowToastClicked : Event()
+    sealed class MyIntent : MviIntent {
+        object OnRandomNumberClicked : MyIntent()
+        object OnShowToastClicked : MyIntent()
     }
 
     data class State(
         val randomNumberState: RandomNumberState
-    ) : UiState
+    ) : MviState
 
     sealed class RandomNumberState {
         object Idle : RandomNumberState()
@@ -29,9 +29,9 @@ class MainContract {
         data class Success(val number : Int) : RandomNumberState()
     }
 
-    sealed class Effect : UiEffect {
+    sealed class Result : MviResult {
 
-        object ShowToast : Effect()
+        object ShowToast : Result()
 
     }
 
