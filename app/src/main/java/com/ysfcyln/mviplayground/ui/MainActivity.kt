@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenStarted {
             viewModel.result.collect {
                 when (it) {
-                    is MainContract.Effect.Result.ShowToast -> {
+                    is MainContract.Result.ShowToast -> {
                         binding.progressBar.isVisible = false
                         showToast("Error, number is even")
                     }
